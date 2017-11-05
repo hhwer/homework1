@@ -11,7 +11,7 @@ int main(int argc, char ** argv)
 	else	
 		n = atoi(argv[1]); 
 	
-	MPI_Status status;
+//	MPI_Status status;
 	float* myRows[8],*downRows[8],*leftRows[8],*rightRows[8];
 //	float* x01,*x02,*x03,*x04,*x05,*x06,*x07,*x08;
 //	float* x11,*x12,*x13,*x14,*x15,*x16,*x17,*x18;
@@ -19,15 +19,17 @@ int main(int argc, char ** argv)
 //	float* y25,*y26,*y27,*y28;
 	int Nrec = n*n;
 	int Ntri = n*(n-1)/2;
-	int i,j,k,total,myid;
-	float epi = 0;
-	int ite,rank ;
-	int para1[] = {0,-5,-2,3,-1,-4,-1,-4};	
-	int para2[] = {1,1,1,1,0,-5,-2,-3};	
+	int i,j,k;
+//	int total,myid;
+	float epi = 1;
+	int ite = 0;
+//	int rank ;
+//	int para1[] = {0,-5,-2,3,-1,-4,-1,-4};	
+//	int para2[] = {1,1,1,1,0,-5,-2,-3};	
 
 
-	MPI_Init(&argc, &argv);
-	MPI_Comm_rank(MPI_COMM_WORLD, &myid);
+//	MPI_Init(&argc, &argv);
+//	MPI_Comm_rank(MPI_COMM_WORLD, &myid);
 
 //  x01 = (float *) malloc(sizeof(float)*(n*(n+1)/2+1));
 //  x02 = (float *) malloc(sizeof(float)*(n*(n+1)/2+1));
@@ -41,13 +43,13 @@ int main(int argc, char ** argv)
 // 初始化
 	for(i=0;i<4;i++)
 	{	
-		if(myid == i)
+//		if(myid == i)
 		myRows[i] = x_init(n*(n+1)/2+1);
 	}
 
 	for(i=4;i<8;i++)
 	{
-		if(myid == i)
+//		if(myid == i)
 		{
 			myRows[i] = x_init(n*(n+1));
 			rightRows[i] = x_init(n+1);
@@ -93,189 +95,193 @@ int main(int argc, char ** argv)
 
 
 	
-	for(ite=0;ite<50000;ite++)
-	{
-
-		//计算
-		for(rank=0;rank<4;rank++)
-		{
-			if(myid == rank)
-				iter_1(myRows[rank],downRows[rank],leftRows[rank],n,								para1[rank],para2[rank]);
-		}
-
-		for(rank=4;rank<8;rank++)
-		{
-			if(myid == rank)
-				iter_2(myRows[rank],downRows[rank],leftRows[rank],								rightRows[rank],n,para1[rank],para2[rank]);
-		}
-
-		//传递数据
-		
-		for(i=1;i<n;i++)
-		{
-			j = Ntri+i;
-			k = Nrec+i;
-			for(rank=0;rank<8;rank=rank+2)
-			{	
-				if(myid==rank)
-				{
-					downRows[rank+1][i] = myRows[rank][j];
-					MPI_Send(&downRows[rank+1][i], 8, MPI_FLOAT, myid+1, 0									, MPI_COMM_WORLD);
-					MPI_Recv(&downRows[rank][i], 8, MPI_FLOAT, myid+1									, 0, MPI_COMM_WORLD, &status);
-
-				}
-			}
-		
-			for(rank=1;rank<8;rank=rank+2)
-			{	
-				if(myid==rank)
-				{
-					downRows[rank-1][i] = myRows[rank][j];
-
-					MPI_Send(&downRows[rank-1][i], 8, MPI_FLOAT, myid-1, 0									, MPI_COMM_WORLD);
-					MPI_Recv(&downRows[rank][i], 8, MPI_FLOAT, myid-1									, 0, MPI_COMM_WORLD, &status);
-
-				}
-			}
-			
-			j = i*n+n;
-			k = i*(i-1)/2+1;
-
-			for(rank=0;rank<4;rank++)
-			{
-				if(myid==rank)
-				{
-					rightRows[rank+4][i]=myRows[rank][j];
-
-					MPI_Send(&rightRows[rank+4][i], 8, MPI_FLOAT, myid+4, 0									, MPI_COMM_WORLD);
-					MPI_Recv(&leftRows[rank][i], 8, MPI_FLOAT, myid+4									, 0, MPI_COMM_WORLD, &status);
-
-
-				}
-				else if(myid==rank+4)
-				{
-					leftRows[rank-4][i]=myRows[rank][k];
-
-					MPI_Send(&leftRows[rank-4][i], 8, MPI_FLOAT, myid-4, 0									, MPI_COMM_WORLD);
-					MPI_Recv(&rightRows[rank-4][i], 8, MPI_FLOAT, myid-4									, 0, MPI_COMM_WORLD, &status);
-		
-				}
-			}
-			j = n*i+1;
-
-			for(rank=5;rank<7;rank++)
-			{
-				if(myid==rank)
-				{
-					leftRows[rank+2][i]=myRows[rank][j];
-
-					MPI_Send(&leftRows[rank+2][i], 8, MPI_FLOAT, myid+2, 0									, MPI_COMM_WORLD);
-					MPI_Recv(&leftRows[rank+2][i], 8, MPI_FLOAT, myid+2									, 0, MPI_COMM_WORLD, &status);
-
-				}
-				else if(myid==rank+2)
-				{
-					leftRows[rank-2][i]=myRows[rank][j];
-
-					MPI_Send(&leftRows[rank-2][i], 8, MPI_FLOAT, myid-2, 0									, MPI_COMM_WORLD);
-					MPI_Recv(&leftRows[rank-2][i], 8, MPI_FLOAT, myid-2									, 0, MPI_COMM_WORLD, &status);
-
-				}
-			}
-		}
-		for(rank=0;rank<8;rank++)
-		{
-			if(myid==rank)
-				epi = myRows[rank][0];
-				MPI_Send(&epi, 8, MPI_FLOAT, 8, 0,										 MPI_COMM_WORLD);
-			if(myid==8)
-			{
-				MPI_Recv(&epi, rank, MPI_FLOAT, myid-2									, 0, MPI_COMM_WORLD, &status);
-				total = total + epi;
-			}
-
-		}
-		if(myid==8)
-		{
-			total = total/n/n/6;	
-			if(total<1e-14)	
-				break;
-		}
-
-	}
-
-	for(rank=0;rank<8;rank++)
-	{
-		if(myid!=8)
-		{
-			MPI_Send(&leftRows[myid], 8, MPI_FLOAT, 8, 0									, MPI_COMM_WORLD);
-		}
-		else
-		{
-			MPI_Recv(&leftRows[rank], 8, MPI_FLOAT, rank									, 0, MPI_COMM_WORLD, &status);
-		}
-	}
-	if(myid==8)
-		{
-			draw(myRows[0],myRows[1],myRows[2],myRows[3],myRows[4],myRows[5]								,myRows[6],myRows[7],n);
-			printf("hello\n");
-		}
-		
-	MPI_Finalize();
-	
-//	while (epi>1e-16 && ite<100000)
-//	{	
-//		ite ++;
+//	for(ite=0;ite<50000;ite++)
+//	{
+//
+//		//计算
+//		for(rank=0;rank<4;rank++)
+//		{
+//			if(myid == rank)
+//				iter_1(myRows[rank],downRows[rank],leftRows[rank],n,								para1[rank],para2[rank]);
+//		}
+//
+//		for(rank=4;rank<8;rank++)
+//		{
+//			if(myid == rank)
+//				iter_2(myRows[rank],downRows[rank],leftRows[rank],								rightRows[rank],n,para1[rank],para2[rank]);
+//		}
+//
+//		//传递数据
 //		
-//
-//		iter_1(x01,x11,y11,n,0,1);
-//		iter_1(x02,x12,y12,n,-5,1);
-//		iter_1(x03,x13,y13,n,-2,1);
-//		iter_1(x04,x14,y14,n,-3,1);
-//		iter_2(x05,x15,y15,y25,n,-1,0);	
-//		iter_2(x06,x16,y16,y26,n,-4,-5);	
-//		iter_2(x07,x17,y17,y27,n,-1,-2);	
-//		iter_2(x08,x18,y18,y28,n,-4,-3);	
-//
-//
-//		for (i=1;i<=n;i++)
+//		for(i=1;i<n;i++)
 //		{
 //			j = Ntri+i;
 //			k = Nrec+i;
-//			x11[i] = x02[j];
-//			x12[i] = x01[j];
-//			x13[i] = x04[j];
-//			x14[i] = x03[j];
-//			x15[i] = x06[k];
-//			x16[i] = x05[k];
-//			x17[i] = x08[k];
-//			x18[i] = x07[k];
+//			for(rank=0;rank<8;rank=rank+2)
+//			{	
+//				if(myid==rank)
+//				{
+//					downRows[rank+1][i] = myRows[rank][j];
+//					MPI_Send(&downRows[rank+1][i], 8, MPI_FLOAT, myid+1, 0									, MPI_COMM_WORLD);
+//					MPI_Recv(&downRows[rank][i], 8, MPI_FLOAT, myid+1									, 0, MPI_COMM_WORLD, &status);
+//
+//				}
+//			}
+//		
+//			for(rank=1;rank<8;rank=rank+2)
+//			{	
+//				if(myid==rank)
+//				{
+//					downRows[rank-1][i] = myRows[rank][j];
+//
+//					MPI_Send(&downRows[rank-1][i], 8, MPI_FLOAT, myid-1, 0									, MPI_COMM_WORLD);
+//					MPI_Recv(&downRows[rank][i], 8, MPI_FLOAT, myid-1									, 0, MPI_COMM_WORLD, &status);
+//
+//				}
+//			}
 //			
 //			j = i*n+n;
 //			k = i*(i-1)/2+1;
-//			y11[i] = x05[j];
-//			y12[i] = x06[j];
-//			y13[i] = x07[j];
-//			y14[i] = x08[j];
-//			y25[i] = x01[k];
-//			y26[i] = x02[k];
-//			y27[i] = x03[k];
-//			y28[i] = x04[k];
 //
+//			for(rank=0;rank<4;rank++)
+//			{
+//				if(myid==rank)
+//				{
+//					rightRows[rank+4][i]=myRows[rank][j];
+//
+//					MPI_Send(&rightRows[rank+4][i], 8, MPI_FLOAT, myid+4, 0									, MPI_COMM_WORLD);
+//					MPI_Recv(&leftRows[rank][i], 8, MPI_FLOAT, myid+4									, 0, MPI_COMM_WORLD, &status);
+//
+//
+//				}
+//				else if(myid==rank+4)
+//				{
+//					leftRows[rank-4][i]=myRows[rank][k];
+//
+//					MPI_Send(&leftRows[rank-4][i], 8, MPI_FLOAT, myid-4, 0									, MPI_COMM_WORLD);
+//					MPI_Recv(&rightRows[rank-4][i], 8, MPI_FLOAT, myid-4									, 0, MPI_COMM_WORLD, &status);
+//		
+//				}
+//			}
 //			j = n*i+1;
-//			y15[i] = x07[j];
-//			y17[i] = x05[j];
-//			y16[i] = x08[j];
-//			y18[i] = x06[j];
+//
+//			for(rank=5;rank<7;rank++)
+//			{
+//				if(myid==rank)
+//				{
+//					leftRows[rank+2][i]=myRows[rank][j];
+//
+//					MPI_Send(&leftRows[rank+2][i], 8, MPI_FLOAT, myid+2, 0									, MPI_COMM_WORLD);
+//					MPI_Recv(&leftRows[rank+2][i], 8, MPI_FLOAT, myid+2									, 0, MPI_COMM_WORLD, &status);
+//
+//				}
+//				else if(myid==rank+2)
+//				{
+//					leftRows[rank-2][i]=myRows[rank][j];
+//
+//					MPI_Send(&leftRows[rank-2][i], 8, MPI_FLOAT, myid-2, 0									, MPI_COMM_WORLD);
+//					MPI_Recv(&leftRows[rank-2][i], 8, MPI_FLOAT, myid-2									, 0, MPI_COMM_WORLD, &status);
+//
+//				}
+//			}
+//		}
+//		for(rank=0;rank<8;rank++)
+//		{
+//			if(myid==rank)
+//				epi = myRows[rank][0];
+//				MPI_Send(&epi, 8, MPI_FLOAT, 8, 0,										 MPI_COMM_WORLD);
+//			if(myid==8)
+//			{
+//				MPI_Recv(&epi, rank, MPI_FLOAT, myid-2									, 0, MPI_COMM_WORLD, &status);
+//				total = total + epi;
+//			}
+//
+//		}
+//		if(myid==8)
+//		{
+//			total = total/n/n/6;	
+//			if(total<1e-14)	
+//				break;
+//		}
+//
+//	}
+//
+//	for(rank=0;rank<8;rank++)
+//	{
+//		if(myid!=8)
+//		{
+//			MPI_Send(&leftRows[myid], 8, MPI_FLOAT, 8, 0									, MPI_COMM_WORLD);
+//		}
+//		else
+//		{
+//			MPI_Recv(&leftRows[rank], 8, MPI_FLOAT, rank									, 0, MPI_COMM_WORLD, &status);
+//		}
+//	}
+//	if(myid==8)
+//		{
+//			draw(myRows[0],myRows[1],myRows[2],myRows[3],myRows[4],myRows[5]								,myRows[6],myRows[7],n);
+//			printf("hello\n");
 //		}
 //		
-//		epi = x01[0] + x02[0] + x03[0] + x04[0] + 									x05[0] + x06[0] + x07[0] + x08[0];
-//		epi = epi/n/n/6;
-//		printf("%.9lf  %d\n",epi,ite);	
-//	}
+//	MPI_Finalize();
+	
+  	while (epi>1e-16 && ite<100000)
+  	{	
+  		ite ++;
+  		
+  
+  		iter_1(myRows[0],downRows[0],leftRows[0],n,0,1);
+  		iter_1(myRows[1],downRows[1],leftRows[1],n,-5,1);
+  		iter_1(myRows[2],downRows[2],leftRows[2],n,-2,1);
+  		iter_1(myRows[3],downRows[3],leftRows[3],n,-3,1);
+  		iter_2(myRows[4],downRows[4],leftRows[4],rightRows[4],n,-1,0);	
+  		iter_2(myRows[5],downRows[5],leftRows[5],rightRows[5],n,-4,-5);	
+  		iter_2(myRows[6],downRows[6],leftRows[6],rightRows[6],n,-1,-2);	
+  		iter_2(myRows[7],downRows[7],leftRows[7],rightRows[7],n,-4,-3);	
+  
+  
+  		for (i=1;i<=n;i++)
+  		{
+  			j = Ntri+i;
+  			k = Nrec+i;
+  			downRows[0][i] = myRows[1][j];
+  			downRows[1][i] = myRows[0][j];
+  			downRows[2][i] = myRows[3][j];
+  			downRows[3][i] = myRows[2][j];
+  			downRows[4][i] = myRows[5][k];
+  			downRows[5][i] = myRows[4][k];
+  			downRows[6][i] = myRows[7][k];
+  			downRows[7][i] = myRows[6][k];
+  			
+  			j = i*n+n;
+  			k = i*(i-1)/2+1;
+  			leftRows[0][i] = myRows[4][j];
+  			leftRows[1][i] = myRows[5][j];
+  			leftRows[2][i] = myRows[6][j];
+  			leftRows[3][i] = myRows[7][j];
+  			rightRows[4][i] = myRows[0][k];
+  			rightRows[5][i] = myRows[1][k];
+  			rightRows[6][i] = myRows[2][k];
+  			rightRows[7][i] = myRows[3][k];
+  
+  			j = n*i+1;
+  			leftRows[4][i] = myRows[6][j];
+  			leftRows[6][i] = myRows[4][j];
+  			leftRows[5][i] = myRows[7][j];
+  			leftRows[7][i] = myRows[5][j];
+  		}
+  		
+  //		epi = x01[0] + x02[0] + x03[0] + x04[0] + 									x05[0] + x06[0] + x07[0] + x08[0];
+  		epi = 0;
+  		for(i=0;i<8;i++)
+			epi = epi + myRows[i][0];
+  		epi = epi/n/n/6;
+  		printf("%.9lf  %d\n",epi,ite);	
+  	}
+	
+	
+	draw(myRows[0],myRows[1],myRows[2],myRows[3],myRows[4],myRows[5]								,myRows[6],myRows[7],n);
 
-	
-	
 	return 0;
 }
 

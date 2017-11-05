@@ -26,7 +26,7 @@ void draw(float*x01,float*x02,float*x03,float*x04,float*x05,float*x06,										
 	y8 = hy/2 - 1;
 
 FILE *fp;
-fp = fopen("/home/hh/helloworld/homework/hh_draw1.csv","w");
+fp = fopen("/home/hh/helloworld/homework1/homework/hh_draw1.csv","w");
 
 
 
