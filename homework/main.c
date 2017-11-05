@@ -3,22 +3,29 @@
 
 int main(int argc, char ** argv)
 {
+	int a=1;
 	int n;
 	if(argc==1)
 	{	
-		n = 25;	
+		n = 4;	
 	}
 	else	
 		n = atoi(argv[1]); 
-	
+
+
 	MPI_Status status;
-	float* myRows[8],*downRows[8],*leftRows[8],*rightRows[8];
+//	float* myRows[8],*downRows[8],*leftRows[8],*rightRows[8];
+	float** myRows = (float**)malloc(sizeof(float*)*8);
+	float** leftRows = (float**)malloc(sizeof(float*)*8);
+	float** rightRows = (float**)malloc(sizeof(float*)*8);
+	float** downRows = (float**)malloc(sizeof(float*)*8);
+
 	int Nrec = n*n;
 	int Ntri = n*(n-1)/2;
 	int i,j,k,myid;
-	float epi=0; 
-	float total;
-	int ite,rank ;
+//	float epi; 
+//	float total;
+	int rank ;
 	int para1[] = {0,-5,-2,3,-1,-4,-1,-4};	
 	int para2[] = {1,1,1,1,0,-5,-2,-3};	
 
@@ -26,7 +33,21 @@ int main(int argc, char ** argv)
 	MPI_Init(&argc, &argv);
 	MPI_Comm_rank(MPI_COMM_WORLD, &myid);
 
+
+//调试用
+ 	int n0,n1,n2;
+//调试死循环		
+//while(a==1)
+//{}
+
+
+
 // 初始化
+
+	int ite;
+	double epi,total;
+	
+
 	for(i=0;i<4;i++)
 	{	
 		if(myid == i)
@@ -38,7 +59,7 @@ int main(int argc, char ** argv)
 	{
 		if(myid == i)
 		{
-			myRows[i] = x_init(n*(n+1));
+			myRows[i] = x_init(n*(n+1)+1);
 //			rightRows[i] = x_init(n+1);
 		}
 	}
@@ -51,12 +72,12 @@ int main(int argc, char ** argv)
 
 	}
 
-
+	
 	
 
 // printf("Hellow myid=%d  this is myRows initial\n",myid);
 	
- 	for(ite=0;ite<50000;ite++)
+ 	for(ite=0;ite<50000;ite=ite+1)
  	{
 	printf("ite=%d\n",ite); 
  		//计算
@@ -64,95 +85,66 @@ int main(int argc, char ** argv)
  		{
  			if(myid == rank)
 			{
+				printf("myid=%d ite=%d  before caculate\n",myid,ite);
+				
+				n0 = sizeof(myRows[rank]);
+				n1 = sizeof(downRows[rank]);
  				iter_1(myRows[rank],downRows[rank],leftRows[rank],n,								para1[rank],para2[rank]);
-//				printf("myid=%d  this is calculate myRows\n",myid);
+				printf("myid=%d ite=%d  after caculate\n",myid,ite);
 
 			}
-
  		}
  
  		for(rank=4;rank<8;rank++)
  		{
  			if(myid == rank)
 			{
+				printf("myid=%d ite=%d  before caculate\n",myid,ite);
+
  				iter_2(myRows[rank],downRows[rank],leftRows[rank],								rightRows[rank],n,para1[rank],para2[rank]);
-//				printf("myid=%d  this is calculate myRows\n",myid);
+				printf("myid=%d ite=%d  after caculate\n",myid,ite);
+
 			}
 
  		}
- 
  		//传递数据
- 		
- 		for(i=1;i<n;i++)
+
+//边界的提取
+ 		for(i=1;i<=n;i++)
  		{
  			j = Ntri+i;
  			k = Nrec+i;
- 			for(rank=0;rank<8;rank=rank+2)
+ 			for(rank=0;rank<4;rank=rank+2)
  			{	
  				if(myid==rank)
  				{
- 					downRows[rank+1][i] = myRows[rank][j];
- 					MPI_Send(&downRows[rank+1][i], 8, MPI_FLOAT, myid+1, 0									, MPI_COMM_WORLD);
-//					printf("myid=%d  send downrows %d to %d\n",myid,i,rank+1);
-
- 					MPI_Recv(&downRows[rank][i], 8, MPI_FLOAT, myid+1									, 0, MPI_COMM_WORLD, &status);
-//					printf("myid=%d  receive downrows %d to %d\n",myid,i,rank+1);
-					
- 
+ 					downRows[myid+1][i] = myRows[myid][j];
  				}
+				else if(myid==rank+1)
+					downRows[myid-1][i] = myRows[myid][j];
  			}
  		
- 			for(rank=1;rank<8;rank=rank+2)
+ 			for(rank=4;rank<8;rank=rank+2)
  			{	
  				if(myid==rank)
  				{
- 					downRows[rank-1][i] = myRows[rank][j];
-
- 					MPI_Recv(&downRows[rank][i], 8, MPI_FLOAT, myid-1									, 0, MPI_COMM_WORLD, &status);
-
-//					printf("myid=%d  receive downrows %d to %d\n",myid,i,rank-1);
-
-
- 					MPI_Send(&downRows[rank-1][i], 8, MPI_FLOAT, myid-1, 0									, MPI_COMM_WORLD);
-//					printf("myid=%d  send downrows %d to %d\n",myid,i,rank-1);
+ 					downRows[myid+1][i] = myRows[myid][k];
  				}
+				else if(myid==rank+1)
+					downRows[myid-1][i] =myRows[myid][k];
  			}
- 			
  			j = i*n+n;
  			k = i*(i-1)/2+1;
-			
-//			printf("myid=%d  finish ith downrows transmission\n",myid);
  			for(rank=0;rank<4;rank++)
  			{
 
  				if(myid==rank)
  				{
-//					printf("myid=%d  want to update rightrows\n",myid);
-
- 					rightRows[rank+4][i]=myRows[rank][j];
-					
-//					printf("myid=%d  updated rightrows\n",myid);
-
-
- 					MPI_Send(&rightRows[rank+4][i], 8, MPI_FLOAT, myid+4, 0									, MPI_COMM_WORLD);
-//					printf("myid=%d  send rightrows %d to %d\n",myid,i,rank+4);
-
-
- 					MPI_Recv(&leftRows[rank][i], 8, MPI_FLOAT, myid+4									, 0, MPI_COMM_WORLD, &status);
- 
- 
+ 					rightRows[myid+4][i]=myRows[myid][k];
  				}
  				else if(myid==rank+4)
  				{
- 					leftRows[myid-4][i]=myRows[myid][k];
- 
- 					MPI_Recv(&rightRows[myid-4][i], 8, MPI_FLOAT, myid-4									, 0, MPI_COMM_WORLD, &status);
- 					MPI_Send(&leftRows[myid-4][i], 8, MPI_FLOAT, myid-4, 0									, MPI_COMM_WORLD);
-//					printf("myid=%d  send leftrows %d to %d\n",myid,i,myid-4);
-
-
-
- 		
+ 					leftRows[myid-4][i]=myRows[myid][j];
  				}
  			}
  			j = n*i+1;
@@ -161,35 +153,111 @@ int main(int argc, char ** argv)
  			{
  				if(myid==rank)
  				{
- 					leftRows[rank+2][i]=myRows[rank][j];
- 
- 					MPI_Send(&leftRows[rank+2][i], 8, MPI_FLOAT, myid+2, 0									, MPI_COMM_WORLD);
-//					printf("myid=%d  send leftrows %d to %d\n",myid,i,rank+2);
-
- 					MPI_Recv(&leftRows[rank+2][i], 8, MPI_FLOAT, myid+2									, 0, MPI_COMM_WORLD, &status);
- 
+ 					leftRows[myid+2][i]=myRows[myid][j];
  				}
  				else if(myid==rank+2)
  				{
- 					leftRows[rank-2][i]=myRows[rank][j];
- 
- 					MPI_Recv(&leftRows[rank-2][i], 8, MPI_FLOAT, myid-2									, 0, MPI_COMM_WORLD, &status);
- 					MPI_Send(&leftRows[rank-2][i], 8, MPI_FLOAT, myid-2, 0									, MPI_COMM_WORLD);
-					printf("myid=%d  send leftrows %d to %d\n",myid,i,rank-2); 
+ 					leftRows[myid-2][i]=myRows[myid][j];
  				}
  			}
  		}
- 		epi = myRows[myid][0];
-		printf("myid=%d epi= %.9fl\n ",myid,epi);
-		MPI_Reduce(&epi, &total, 8, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);	
-		total = total/n/n/6;
-		printf("%.13lf  %d\n",total,ite);
+		printf("myid=%d ite=%d  after caculate bound\n",myid,ite);
 
-		if(total<1e-12)
-		{
-			break;
+		
+		MPI_Barrier(MPI_COMM_WORLD);
+		
+
+//边界的传递
+		
+		//底边的交互
+		for(rank=0;rank<8;rank=rank+2)
+		{	
+			if(myid==rank)
+			{
+				MPI_Send(&downRows[myid+1], n+1, MPI_FLOAT, myid+1, 1									, MPI_COMM_WORLD);
+				printf("myid=%d ite=%d down send to myid+1\n",myid,ite);
+				
+				MPI_Recv(&downRows[myid], n+1, MPI_FLOAT, myid+1									, 2, MPI_COMM_WORLD, &status);
+			}
+			else if(myid==rank+1)
+			{
+				MPI_Recv(&downRows[myid], n+1, MPI_FLOAT, myid-1									, 1, MPI_COMM_WORLD, &status);
+				printf("myid=%d ite=%d down recv from myid-1\n",myid,ite);	
+				MPI_Send(&downRows[myid-1], n+1, MPI_FLOAT, myid-1, 2									, MPI_COMM_WORLD);
+			}
 
 		}
+		
+		//三角形左边 矩形右边
+		for(rank=0;rank<4;rank++)
+		{
+			if(myid==rank)
+			{
+ 					MPI_Send(&rightRows[myid+4], n+1, MPI_FLOAT, myid+4, 3									, MPI_COMM_WORLD);
+					printf("myid=%d ite=%d right send to myid+4\n",myid,ite);	
+
+					MPI_Recv(&leftRows[myid], n+1, MPI_FLOAT, myid+4									, 4, MPI_COMM_WORLD, &status);
+					printf("myid=%d ite=%d left recv from myid+4\n",myid,ite);	
+							
+			}
+			else if(myid==rank+4)
+			{
+					MPI_Recv(&rightRows[myid], n+1, MPI_FLOAT, myid-4									, 3, MPI_COMM_WORLD, &status);
+					printf("myid=%d ite=%d right recv from myid-4\n",myid,ite);	
+
+ 					MPI_Send(&leftRows[myid-4], n+1, MPI_FLOAT, myid-4, 4									, MPI_COMM_WORLD);
+					printf("myid=%d ite=%d left send to myid-4\n",myid,ite);	
+
+			}
+		}
+
+		//
+ 		for(rank=4;rank<6;rank++)
+		{
+			if(myid==rank)
+			{
+ 					MPI_Send(&leftRows[myid+2], n+1, MPI_FLOAT, myid+2, 5									, MPI_COMM_WORLD);
+					printf("myid=%d ite=%d left send to myid+2\n",myid,ite);	
+
+ 					MPI_Recv(&leftRows[myid], n+1, MPI_FLOAT, myid+2									, 6, MPI_COMM_WORLD, &status);
+					printf("myid=%d ite=%d left recv from myid+2\n",myid,ite);	
+
+			}
+			else if(myid==rank+2)
+			{
+ 					MPI_Recv(&leftRows[myid], n+1, MPI_FLOAT, myid-2									, 5, MPI_COMM_WORLD, &status);
+					printf("myid=%d ite=%d left recv from myid-2\n",myid,ite);	
+					
+ 					MPI_Send(&leftRows[myid-2], n+1, MPI_FLOAT, myid-2, 6									, MPI_COMM_WORLD);
+					printf("myid=%d ite=%d left send to myid-2\n",myid,ite);	
+			}
+		}
+		
+
+
+ 		epi = myRows[myid][0];
+		printf("myid=%d ite=%d epi= %.9lf\n ",myid,ite,epi);
+//		MPI_Reduce(&epi,&total, 1, MPI_DOUBLE, MPI_SUM,											 0, MPI_COMM_WORLD);	
+
+		if(myid==0)
+		{
+			total = total/n/n/6;
+			printf("myid=%d total=%.13lf  ite=%d\n",myid,total,ite);
+		}
+		printf("myid=%d is waiting 1\n",myid);
+		MPI_Barrier(MPI_COMM_WORLD);
+		
+//		死循环
+//		while(a==1)
+//		{}
+
+
+//		if(total<1e-12 && myid == 0)
+//		{
+//			printf("myid=%d total break\n",myid);
+//			MPI_Abort(MPI_COMM_WORLD, 250);
+//		}
+//		MPI_Barrier(MPI_COMM_WORLD);
 
 //		if(myid==8)
 // 		{
@@ -247,7 +315,6 @@ int main(int argc, char ** argv)
 //			printf("hello\n");
 //		}
 		
-	MPI_Finalize();
 	
 
 	
