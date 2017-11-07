@@ -76,7 +76,7 @@ int iter_2(float* x0 ,float* x1 ,float* y1,float* y2, int n, int f,int g)
 	a = x0[index];
 
 //	new[index] = ((alpha*(x0[index+1]+y1[n])												+ beta*(x1[1])+new[index-n-1]) - g)/2/(alpha+beta);			
-	x0[index] = ((alpha*(x0[index+1]+y1[n])												+ beta*(x1[1]+x0[index-n-1])) - g)/2/(alpha+beta);			
+	x0[index] = ((alpha*(x0[index+1]+y1[n])												+ beta*(x1[1]+x0[index-n])) - g)/2/(alpha+beta);			
 	epi = epi + (a-x0[index])*(a-x0[index]);
 
 	for (j=2; j<n; j++)

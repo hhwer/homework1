@@ -24,8 +24,8 @@ int main(int argc, char ** argv)
 	float epi = 1;
 	int ite = 0;
 //	int rank ;
-//	int para1[] = {0,-5,-2,3,-1,-4,-1,-4};	
-//	int para2[] = {1,1,1,1,0,-5,-2,-3};	
+	int para1[] = {0,-5,-2,3,-1,-4,-1,-4};	
+	int para2[] = {1,1,1,1,0,-5,-2,-3};	
 
 
 //	MPI_Init(&argc, &argv);
@@ -230,14 +230,14 @@ int main(int argc, char ** argv)
   		ite ++;
   		
   
-  		iter_1(myRows[0],downRows[0],leftRows[0],n,0,1);
-  		iter_1(myRows[1],downRows[1],leftRows[1],n,-5,1);
-  		iter_1(myRows[2],downRows[2],leftRows[2],n,-2,1);
-  		iter_1(myRows[3],downRows[3],leftRows[3],n,-3,1);
-  		iter_2(myRows[4],downRows[4],leftRows[4],rightRows[4],n,-1,0);	
-  		iter_2(myRows[5],downRows[5],leftRows[5],rightRows[5],n,-4,-5);	
-  		iter_2(myRows[6],downRows[6],leftRows[6],rightRows[6],n,-1,-2);	
-  		iter_2(myRows[7],downRows[7],leftRows[7],rightRows[7],n,-4,-3);	
+  		iter_1(myRows[0],downRows[0],leftRows[0],n,para1[0],1);
+  		iter_1(myRows[1],downRows[1],leftRows[1],n,para1[1],1);
+  		iter_1(myRows[2],downRows[2],leftRows[2],n,para1[2],1);
+  		iter_1(myRows[3],downRows[3],leftRows[3],n,para1[3],1);
+  		iter_2(myRows[4],downRows[4],leftRows[4],rightRows[4],n,para1[4],para2[4]);	
+  		iter_2(myRows[5],downRows[5],leftRows[5],rightRows[5],n,para1[5],para2[5]);	
+  		iter_2(myRows[6],downRows[6],leftRows[6],rightRows[6],n,para1[6],para2[6]);	
+  		iter_2(myRows[7],downRows[7],leftRows[7],rightRows[7],n,para1[7],para2[7]);	
   
   
   		for (i=1;i<=n;i++)

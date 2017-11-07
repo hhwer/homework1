@@ -42,29 +42,29 @@ fp = fopen("/home/hh/helloworld/homework1/homework/hh_draw1.csv","w");
 			fprintf(fp,"%.6f %.6f %.6f\n",x2+x,y2+y,x02[k]);
 			fprintf(fp,"%.6f %.6f %.6f\n",x3-x,y3-y,x03[k]);
 			fprintf(fp,"%.6f %.6f %.6f\n",x4-x,y4+y,x04[k]);	
-		}
-		k = i*n;
-		for(j=1;j<=n;j++)
-		{
-			k = k+1;
-			x = (j-1)*hx;
-			fprintf(fp,"%.6f %.6f %.6f\n",x5+x,y5-y,x05[k]);
-			fprintf(fp,"%.6f %.6f %.6f\n",x6+x,y6+y,x06[k]);
+  	}
+  	k = i*n;
+  	for(j=1;j<=n;j++)
+  	{
+  		k = k+1;
+  		x = (j-1)*hx;
+  		fprintf(fp,"%.6f %.6f %.6f\n",x5+x,y5-y,x05[k]);
+  		fprintf(fp,"%.6f %.6f %.6f\n",x6+x,y6+y,x06[k]);
 			fprintf(fp,"%.6f %.6f %.6f\n",x7-x,y7-y,x07[k]);
-			fprintf(fp,"%.6f %.6f %.6f\n",x8-x,y8+y,x08[k]);
+  		fprintf(fp,"%.6f %.6f %.6f\n",x8-x,y8+y,x08[k]);
 
 
 
-		}
+  	}
 
-	}
+  }
 
-	for(j=1;j<=n;j++)
-	{	
-		y = -hy;
-		x = (j-1)*hx;
-		fprintf(fp,"%.6f %.6f %.6f\n",x5+x,y5-y,x05[j]);
-		fprintf(fp,"%.6f %.6f %.6f\n",x6+x,y6+y,x06[j]);
+  for(j=1;j<=n;j++)
+  {	
+  	y = -hy;
+  	x = (j-1)*hx;
+  	fprintf(fp,"%.6f %.6f %.6f\n",x5+x,y5-y,x05[j]);
+  	fprintf(fp,"%.6f %.6f %.6f\n",x6+x,y6+y,x06[j]);
 		fprintf(fp,"%.6f %.6f %.6f\n",x7-x,y7-y,x07[j]);
 		fprintf(fp,"%.6f %.6f %.6f\n",x8-x,y8+y,x08[j]);
 

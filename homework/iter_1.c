@@ -32,7 +32,7 @@ int iter_1(float* x0 ,float* x1 ,float* y1, int n, int f,int K)
 		//i,1节点 在左边界
 		a = x0[index];
 //		new[index] = ((alpha*(x0[index+1]+y1[i])												+ beta*(x0[index+i])+new[index-i-1]) - f)/2 /								(alpha+beta);
-		x0[index] = ((alpha*(x0[index+1]+y1[i])												+ beta*(x0[index+i]+x0[index-i-1])) - f)/2 /								(alpha+beta);
+		x0[index] = ((alpha*(x0[index+1]+y1[i])												+ beta*(x0[index+i]+x0[index-i+1])) - f)/2 /								(alpha+beta);
 		epi = epi + (a-x0[index])*(a-x0[index]);
 		for (j=2; j<i; j++)
 		{
@@ -41,7 +41,7 @@ int iter_1(float* x0 ,float* x1 ,float* y1, int n, int f,int K)
 
 			//i,j节点(内部)
 //			new[index] = ((alpha*(x0[index+1]+new[index-1])										+ beta*(x0[index+i])+new[index-i-1]) - f)/2 /								(alpha+beta);
-			x0[index] = ((alpha*(x0[index+1]+x0[index-1])										+ beta*(x0[index+i]+x0[index-i-1])) - f)/2 /								(alpha+beta);
+			x0[index] = ((alpha*(x0[index+1]+x0[index-1])										+ beta*(x0[index+i]+x0[index-i+1])) - f)/2 /								(alpha+beta);
 
 			epi = epi + (a-x0[index])*(a-x0[index]);
 			
@@ -61,7 +61,7 @@ int iter_1(float* x0 ,float* x1 ,float* y1, int n, int f,int K)
 
 	// n,1 节点
 //	new[index] = ((alpha*(x0[index+1]+y1[n])													+ beta*(x1[1])+new[index-n-1]) - f)/2/(alpha+beta);
-	x0[index] = ((alpha*(x0[index+1]+y1[n])													+ beta*(x1[1]+x0[index-n-1])) - f)/2/(alpha+beta);
+	x0[index] = ((alpha*(x0[index+1]+y1[n])													+ beta*(x1[1]+x0[index-n+1])) - f)/2/(alpha+beta);
 	epi = epi + (a-x0[index])*(a-x0[index]);
 	
 	for (j=2; j<n; j++)
@@ -70,7 +70,7 @@ int iter_1(float* x0 ,float* x1 ,float* y1, int n, int f,int K)
 		a = x0[index];
 		//n,j节点 下底边
 //		new[index] = ((alpha*(x0[index+1]+new[index-1])											+ beta*(x1[j])+new[index-n-1]) - f)/2/(alpha+beta);
-		x0[index] = ((alpha*(x0[index+1]+x0[index-1])											+ beta*(x1[j]+x0[index-n-1])) - f)/2/(alpha+beta);
+		x0[index] = ((alpha*(x0[index+1]+x0[index-1])											+ beta*(x1[j]+x0[index-n+1])) - f)/2/(alpha+beta);
 		epi = epi + (a-x0[index])*(a-x0[index]);
 		
 	}
