@@ -28,9 +28,9 @@ void draw(float*x01,float*x02,float*x03,float*x04,float*x05,float*x06,										
 //MPI_FILE fp;	
 //MPI_File_open(MPI_COMM_WORLD,"data",MPI_MODE_RDONLY,MPI_INFO_NULL,&fh);/
 FILE *fp;
-fp = fopen("/home/hh/helloworld/homework1/homeword/hh_draw1.csv","w");
+fp = fopen("/home/hh/helloworld/homework1/homework/hh_draw1.csv","w");
 
-MPI_File_open(MPI_COMM_WORLD,"data",MPI_MODE_RDONLY,MPI_INFO_NULL,&fh);
+//MPI_File_open(MPI_COMM_WORLD,"data",MPI_MODE_RDONLY,MPI_INFO_NULL,&fh);
 
 	for(i=1;i<=n;i++)
 	{	
@@ -40,16 +40,16 @@ MPI_File_open(MPI_COMM_WORLD,"data",MPI_MODE_RDONLY,MPI_INFO_NULL,&fh);
 		{
 			x = (j-1)*hx;
 			k = k+1;
-//			MPI_File_write_at_all(fh,0,&n,3,MPI_float,&status);
-//			fprintf(fp,"%.6f %.6f %.6f\n",x1+x,y1-y,x01[k]);
-//			fprintf(fp,"%.6f %.6f %.6f\n",x2+x,y2+y,x02[k]);
-//			fprintf(fp,"%.6f %.6f %.6f\n",x3-x,y3-y,x03[k]);
-//			fprintf(fp,"%.6f %.6f %.6f\n",x4-x,y4+y,x04[k]);	
+	//		MPI_File_write_at_all(fh,0,&n,3,MPI_float,&status);
+			fprintf(fp,"%.6f %.6f %.6f\n",x1+x,y1-y,x01[k]);
+			fprintf(fp,"%.6f %.6f %.6f\n",x2+x,y2+y,x02[k]);
+			fprintf(fp,"%.6f %.6f %.6f\n",x3-x,y3-y,x03[k]);
+			fprintf(fp,"%.6f %.6f %.6f\n",x4-x,y4+y,x04[k]);	
 		
-			fwrite(fp,"%.6f %.6f %.6f\n",x1+x,y1-y,x01[k]);
-			fwrite(fp,"%.6f %.6f %.6f\n",x2+x,y2+y,x02[k]);
-			fwrite(fp,"%.6f %.6f %.6f\n",x3-x,y3-y,x03[k]);
-			fwrite(fp,"%.6f %.6f %.6f\n",x4-x,y4+y,x04[k]);	
+//			fwrite(fp,"%.6f %.6f %.6f\n",x1+x,y1-y,x01[k]);
+//			fwrite(fp,"%.6f %.6f %.6f\n",x2+x,y2+y,x02[k]);
+//			fwrite(fp,"%.6f %.6f %.6f\n",x3-x,y3-y,x03[k]);
+//			fwrite(fp,"%.6f %.6f %.6f\n",x4-x,y4+y,x04[k]);	
 		}
 		k = i*n;
 		for(j=1;j<=n;j++)

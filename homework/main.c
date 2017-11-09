@@ -383,7 +383,7 @@ printf("myid=%d want to draw\n",myid);
 
 		}
 		draw(myRows[0],myRows[1],myRows[2],myRows[3],myRows[4],myRows[5]								,myRows[6],myRows[7],n);
-
+//		fp = open("/home/hh/helloworld/homework1/homework")	
 //		while(a==0)
 //		{}
 	}
