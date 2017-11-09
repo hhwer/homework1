@@ -13,13 +13,7 @@ int main(int argc, char ** argv)
 	else	
 		n = atoi(argv[1]); 
 
-
 	MPI_Status status;
-//	float* myRows[8],*downRows[8],*leftRows[8],*rightRows[8];
-//	float** myRows = (float**)malloc(sizeof(float*)*8);
-//	float** leftRows = (float**)malloc(sizeof(float*)*8);
-//	float** rightRows = (float**)malloc(sizeof(float*)*8);
-//	float** downRows = (float**)malloc(sizeof(float*)*8);
 	int Nrec = n*n;
 	int Ntri = n*(n-1)/2;
 	int i,j,k,myid;
@@ -46,46 +40,11 @@ for(i=0;i<8;i++)
 	MPI_Comm_rank(MPI_COMM_WORLD, &myid);
 
 
-//调试用
-// 	int n0,n1,n2;
-//调试死循环		
-//while(a==1)
-//{}
-
-
 
 // 初始化
 
 	int ite;
 	
-//
-//	for(i=0;i<4;i++)
-//	{	
-//		if(myid == i)
-//		myRows[i] = x_init(n*(n+1)/2+1);
-//
-//	}
-//
-//	for(i=4;i<8;i++)
-//	{
-//		if(myid == i)
-//		{
-//			myRows[i] = x_init(n*(n+1)+1);
-////			rightRows[i] = x_init(n+1);
-//		}
-//	}
-//
-//	for(i=0;i<8;i++)
-//	{
-//		downRows[i] = x_init(n+1);
-//		leftRows[i] = x_init(n+1);
-//		rightRows[i] = x_init(n+1);
-//
-//	}
-
-	
-	
-
 // printf("Hellow myid=%d  this is myRows initial\n",myid);
 	
  	for(ite=0;ite<5000;ite=ite+1)
@@ -274,11 +233,6 @@ for(i=0;i<8;i++)
 		}
 
 
-//		while(a==1)
-//		{
-//		}
-
-
 		if(myid==0)
 		{
 			total = total/n/n/6;
@@ -318,54 +272,6 @@ for(i=0;i<8;i++)
 
 
 
-//		死循环
-//		while(a==1)
-//		{}
-
-
-//		if(total<1e-12 && myid == 0)
-//		{
-//			printf("myid=%d total break\n",myid);
-//			MPI_Abort(MPI_COMM_WORLD, 250);
-//		}
-//		MPI_Barrier(MPI_COMM_WORLD);
-
-//		if(myid==8)
-// 		{
-//			printf("myid=8\n");
-//			total = 0;
-//			printf("total=0\n");
-//
-//			for(rank=0;rank<8;rank++)
-//			{
-// 				printf("want to receive epi from %d\n",rank);
-// 				MPI_Recv(&rightRows[0][0], 8, MPI_FLOAT, rank
-//				, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-//
-//				printf("myid=8 received epi from %d\n",rank);
-// 				total = total + rightRows[0][0];
-//			}
-// 		}
-//		else
-//		{
-// 			epi = myRows[myid][0];
-//			rightRows[0][0] = myRows[myid][0];
-// 			MPI_Send(&rightRows[0][0], 8, MPI_FLOAT, 8, 1,														MPI_COMM_WORLD);
-//			printf("myid=%d  sended epi\n",myid);
-//				
-//		}
-// 		if(myid==8)
-// 		{
-// 			total = total/n/n/6;	
-//			printf("epi=%.14lf  ite=%d\n",total,ite);
-// 			if(total<1e-14)	
-// 				break;
-// 		}
- 
- 	
-
-
-
 //draw
 printf("myid=%d want to draw\n",myid);
 	if(myid!=0)
@@ -385,16 +291,10 @@ printf("myid=%d want to draw\n",myid);
 
 		}
 		draw(myRows[0],myRows[1],myRows[2],myRows[3],myRows[4],myRows[5]								,myRows[6],myRows[7],n);
-//		fp = open("/home/hh/helloworld/homework1/homework")	
-//		while(a==0)
-//		{}
 	}
 	
 	MPI_Barrier(MPI_COMM_WORLD);		
 	MPI_Finalize();	
-//		printf("hello\n");
-
-		
 	
 	return 0;
 }
