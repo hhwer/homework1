@@ -1,6 +1,6 @@
 
 #include "head.h"
-#define N 25
+#define N 120
 
 int main(int argc, char ** argv)
 {
@@ -8,7 +8,7 @@ int main(int argc, char ** argv)
 	int n;
 	if(argc==1)
 	{	
-		n = 25;	
+		n = N;	
 	}
 	else	
 		n = atoi(argv[1]); 
@@ -27,7 +27,7 @@ int main(int argc, char ** argv)
 	float total;
 	int rank ;
 	int para1[] = {0,-5,-2,3,-1,-4,-1,-4};	
-	int para2[] = {1,1,1,1,0,-5,-2,-3};	
+	int para2[] = {0,1,1,1,0,-5,-2,-3};	
 
 float myRows[8][N*(N+1)+1],downRows[8][N+1],leftRows[8][N+1],rightRows[8][N+1];
 for(i=0;i<8;i++)
@@ -88,7 +88,7 @@ for(i=0;i<8;i++)
 
 // printf("Hellow myid=%d  this is myRows initial\n",myid);
 	
- 	for(ite=0;ite<50000;ite=ite+1)
+ 	for(ite=0;ite<5000;ite=ite+1)
  	{
 //	printf("ite=%d\n",ite); 
  		//计算
@@ -370,6 +370,8 @@ for(i=0;i<8;i++)
 printf("myid=%d want to draw\n",myid);
 	if(myid!=0)
 	{
+		printf("%d want send myrows to 0\n",myid);
+		
 		MPI_Send(&myRows[myid], N*(N+1)+1, MPI_FLOAT, 0, 0									, MPI_COMM_WORLD);
 		printf("%d send myrows to 0\n",myid);
 
@@ -388,9 +390,9 @@ printf("myid=%d want to draw\n",myid);
 //		{}
 	}
 	
-		
+	MPI_Barrier(MPI_COMM_WORLD);		
 	MPI_Finalize();	
-		printf("hello\n");
+//		printf("hello\n");
 
 		
 	
