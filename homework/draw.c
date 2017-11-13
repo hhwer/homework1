@@ -1,4 +1,12 @@
 
+/**
+* @file draw.c
+* @brief 将计算结果写入文件中
+* @author hh
+* @version 1
+* @date 2017-11-13
+*/
+
 #include"head.h"
 
 void draw(float*x01,float*x02,float*x03,float*x04,float*x05,float*x06,										float*x07,float*x08,int n)
