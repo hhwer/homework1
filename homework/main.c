@@ -6,9 +6,9 @@
 * @version 1
 * @date 2017-11-13
 */
-
+#include<time.h>
 #include "head.h"
-#define N 50
+#define N 20
 
 int main(int argc, char ** argv)
 {
@@ -27,9 +27,9 @@ int main(int argc, char ** argv)
 	float epi; 
 	float total;
 	int rank ;
-	int para1[] = {0,-5,-2,3,-1,-4,-1,-4};	
-	int para2[] = {1,1,1,1,0,-5,-2,-3};	
-
+	int para1[] = {0,-5,-2,-3,-1,-4,-1,-4};	
+	int para2[] = {0,1,1,1,0,-5,-2,-3};	
+	clock_t start,finish;
 float myRows[8][N*(N+1)+1],downRows[8][N+1],leftRows[8][N+1],rightRows[8][N+1];
 for(i=0;i<8;i++)
 	{
@@ -50,8 +50,8 @@ for(i=0;i<8;i++)
 
 	int ite;
 	
-	
- 	for(ite=0;ite<2;ite=ite+1)
+	start = clock();
+ 	for(ite=0;ite<100000;ite=ite+1)
  	{
  		/**计算每一分块的迭代*/
  		for(rank=0;rank<4;rank++)
@@ -193,9 +193,10 @@ for(i=0;i<8;i++)
 
 
  		epi = myRows[myid][0];
+
 		if(myid==0)
  		{
-			total = myRows[myid][0];
+			total = epi;
 
 			for(rank=1;rank<8;rank++)
 			{
@@ -207,7 +208,6 @@ for(i=0;i<8;i++)
  		}
 		else
 		{
- 			epi = myRows[myid][0];
  			MPI_Send(&epi, 1, MPI_FLOAT, 0, 0,														MPI_COMM_WORLD);
 		}
 
@@ -236,18 +236,8 @@ for(i=0;i<8;i++)
 		if(a==0)
 			break;
 
-
-
-
 	}
-
-int s1, bufsize;
-char *buf;
-MPI_Pack_size(N*(N+1)+1, MPI_FLOAT, MPI_COMM_WORLD, &s1);
-bufsize = MPI_BSEND_OVERHEAD + s1;
-buf = (char *)malloc(bufsize);
-MPI_Buffer_attach(buf, bufsize);
-
+finish=clock(); 
 //draw
 	if(myid!=0)
 	{
@@ -258,6 +248,10 @@ MPI_Buffer_attach(buf, bufsize);
 	}
 	else
 	{
+		printf("time=%f\n",(double)(finish-start)/CLOCKS_PER_SEC);
+				
+		printf("ite = %d\n total=%.12f\n",ite,total);
+
 		for(rank=1;rank<8;rank++)
 		{
 		MPI_Recv(&myRows[rank], N*(N+1)+1, MPI_FLOAT,rank 									, 0, MPI_COMM_WORLD,&status);
@@ -265,9 +259,6 @@ MPI_Buffer_attach(buf, bufsize);
 		}
 		draw(myRows[0],myRows[1],myRows[2],myRows[3],myRows[4],myRows[5]								,myRows[6],myRows[7],n);
 	}
-	MPI_Buffer_detach(&buf, &bufsize);
-	free(buf);
-	MPI_Barrier(MPI_COMM_WORLD);		
 	MPI_Finalize();	
 	
 	return 0;
