@@ -19,6 +19,7 @@
 * @param n  问题规模\n
 * @param f	左上部分的\f$-\Delta\f$值\n
 * @param g  右上部分的\f$-\Delta\f$值
+* @param K  是否强制边值 K=0强制
 *
 * @returns  计算结果直接在数组x0中更新,迭代步的距离存储在第一位
 */
@@ -85,6 +86,8 @@ int iter_2(float* x0 ,float* x1 ,float* y1,float* y2, int n, int f,int g)
 	}
 	index ++;
 	///  n,1 节点
+	if (K <= 0)
+		x0[index] = 0;
 	a = x0[index];
 
 	x0[index] = ((alpha*(x0[index+1]+y1[n])												+ beta*(x1[1]+x0[index-n])) - g)/2/(alpha+beta);			

@@ -8,7 +8,7 @@
 */
 #include<time.h>
 #include "head.h"
-#define N 20
+#define N 40
 
 int main(int argc, char ** argv)
 {
@@ -215,7 +215,8 @@ for(i=0;i<8;i++)
 		if(myid==0)
 		{
 			total = total/n/n/6;
-			if(total<1e-12)
+			printf("ite=%d total = %.14f\n",ite,total);
+			if(total<1e-14)
 			{
 				a = 0;				
 			}	
@@ -250,7 +251,7 @@ finish=clock();
 	{
 		printf("time=%f\n",(double)(finish-start)/CLOCKS_PER_SEC);
 				
-		printf("ite = %d\n total=%.12f\n",ite,total);
+		printf("ite = %d\n total=%.14f\n",ite,total);
 
 		for(rank=1;rank<8;rank++)
 		{

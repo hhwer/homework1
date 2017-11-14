@@ -19,7 +19,7 @@
 * @param y1	长度位n+1的数组,从第二位开始存储外部左侧边界的n个值\n
 * @param n  问题规模 \n
 * @param f  -\f$\Delta\f$的值 \n
-* @param K  是否使用强制边界条件  K=0为使用\\
+* @param K  是否使用强制边界条件  K=0为使用 让n行1列的点恒为0\n
 *
 * @returns  计算结果直接在数组x0中更新
 */
@@ -77,6 +77,9 @@ int iter_1(float* x0 ,float* x1 ,float* y1, int n, int f,int K)
 
 	///  n,1 节点
 	x0[index] = ((alpha*(x0[index+1]+y1[n])													+ beta*(x1[1]+x0[index-n+1])) - f)/2/(alpha+beta);
+
+	if (K <= 0)
+		x0[index] = 0;
 	epi = epi + (a-x0[index])*(a-x0[index]);
 	
 	for (j=2; j<n; j++)
@@ -92,9 +95,7 @@ int iter_1(float* x0 ,float* x1 ,float* y1, int n, int f,int K)
 	a = x0[index];
 	///  n,n节点
 	x0[index] = (C + alpha_1*x0[index-1] + beta_1*x1[n]) / 								(alpha_1 + beta_1);
-
-	if (K <= 0)
-		x0[index] = 0;
+	
 	epi = epi + (a-x0[index])*(a-x0[index]);
 	
 	x0[0] = epi;
