@@ -86,8 +86,6 @@ int iter_2(float* x0 ,float* x1 ,float* y1,float* y2, int n, int f,int g)
 	}
 	index ++;
 	///  n,1 节点
-	if (K <= 0)
-		x0[index] = 0;
 	a = x0[index];
 
 	x0[index] = ((alpha*(x0[index+1]+y1[n])												+ beta*(x1[1]+x0[index-n])) - g)/2/(alpha+beta);			

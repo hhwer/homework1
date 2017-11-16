@@ -8,8 +8,7 @@
 */
 #include<time.h>
 #include "head.h"
-#define N 40
-
+#define N 20
 int main(int argc, char ** argv)
 {
 	int a=1;
@@ -130,7 +129,7 @@ for(i=0;i<8;i++)
  		}
 
 		
-		MPI_Barrier(MPI_COMM_WORLD);
+//		MPI_Barrier(MPI_COMM_WORLD);
 		
 
 /**边界信息的传递*/
@@ -190,27 +189,22 @@ for(i=0;i<8;i++)
 			}
 		}
 		
-
-
  		epi = myRows[myid][0];
 
-		if(myid==0)
- 		{
-			total = epi;
-
-			for(rank=1;rank<8;rank++)
-			{
- 				MPI_Recv(&epi, 1, MPI_FLOAT, rank
-				, 0, MPI_COMM_WORLD, &status);
-
- 				total = total + epi;
-			}
- 		}
-		else
-		{
- 			MPI_Send(&epi, 1, MPI_FLOAT, 0, 0,														MPI_COMM_WORLD);
-		}
-
+		/* --------------------------------------------------------------------------*/
+		/**
+		* @brief 对所有区域的误差求和
+		*
+		* @param epi  单个区域的误差
+		* @param total 总误差
+		* @param 1    epi是一个float
+		* @param MPI_FLOAT 
+		* @param MPI_SUM   求和符
+		* @param 0    在0进程中求和
+		* @param MPI_COMM_WORLD  
+		*/
+		/* ----------------------------------------------------------------------------*/
+		MPI_Reduce(&epi, &total, 1, MPI_FLOAT, MPI_SUM, 0, MPI_COMM_WORLD);
 
 		if(myid==0)
 		{
@@ -220,24 +214,26 @@ for(i=0;i<8;i++)
 			{
 				a = 0;				
 			}	
-			else
-			{}
-
-			for(rank=1;rank<8;rank++)
-			{
- 				MPI_Send(&a, 1, MPI_INT, rank, 1									, MPI_COMM_WORLD);	
-			}
-
 		}
-			
-		else
-		{
-			MPI_Recv(&a, 1, MPI_INT, 0, 1, MPI_COMM_WORLD,&status);
-		}
+
+		/* --------------------------------------------------------------------------*/
+		/**
+		* @brief   0进程用Bcast将标示a传给所有进程
+		*
+		* @param a  0进程检验终止条件,若终止a=0,否则a=1
+		* @param 1  a是1个整数
+		* @param MPI_INT
+		* @param 0  从0进程Bcast
+		* @param MPI_COMM_WORLD 
+		*/
+		/* ----------------------------------------------------------------------------*/
+		MPI_Bcast(&a, 1, MPI_INT, 0, MPI_COMM_WORLD);		
 		if(a==0)
+		{
 			break;
-
-	}
+		}
+		
+	}   // end of the iteration 
 finish=clock(); 
 //draw
 	if(myid!=0)
